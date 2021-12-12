@@ -46,7 +46,7 @@ typedef struct {
 static const char pg_default_encoding[] = "unicode_escape";
 static const char pg_default_errors[] = "backslashreplace";
 
-static PyObject* os_module = NULL;
+static PyObject *os_module = NULL;
 
 #define PATHLIB "pathlib"
 #define PUREPATH "PurePath"
@@ -150,8 +150,9 @@ fetch_object_methods(pgRWHelper *helper, PyObject *obj)
     return 0;
 }
 
-/* This function is meant to decode a pathlib object into its str/bytes representation.
- * It is based on PyOS_FSPath, and defines this function on python 3.4, 3.5 */
+/* This function is meant to decode a pathlib object into its str/bytes
+ * representation. It is based on PyOS_FSPath, and defines this function on
+ * python 3.4, 3.5 */
 static PyObject *
 _trydecode_pathlibobj(PyObject *obj)
 {
@@ -215,11 +216,11 @@ pg_EncodeString(PyObject *obj, const char *encoding, const char *errors,
     if (errors == NULL) {
         errors = pg_default_errors;
     }
-    
+
     ret = _trydecode_pathlibobj(obj);
     if (!ret)
         return NULL;
-    
+
     if (PyUnicode_Check(ret)) {
         oencoded = PyUnicode_AsEncodedString(ret, encoding, errors);
         Py_DECREF(ret);
@@ -259,7 +260,7 @@ pg_EncodeString(PyObject *obj, const char *encoding, const char *errors,
         PyErr_Clear();
         Py_RETURN_NONE;
     }
-    
+
     if (Bytes_Check(ret)) {
         return ret;
     }
@@ -272,7 +273,7 @@ static PyObject *
 pg_EncodeFilePath(PyObject *obj, PyObject *eclass)
 {
     PyObject *result = pg_EncodeString(obj, UNICODE_DEF_FS_CODEC,
-                                            UNICODE_DEF_FS_ERROR, eclass);
+                                       UNICODE_DEF_FS_ERROR, eclass);
     if (result == NULL || result == Py_None) {
         return result;
     }
@@ -301,8 +302,8 @@ pgRWops_IsFileObject(SDL_RWops *rw)
     return rw->close == _pg_rw_close;
 }
 
-char*
-pgRWops_GetFileExtension(SDL_RWops* rw)
+char *
+pgRWops_GetFileExtension(SDL_RWops *rw)
 {
     if (pgRWops_IsFileObject(rw)) {
         return NULL;
@@ -396,13 +397,13 @@ _pg_rw_write(SDL_RWops *context, const void *ptr, size_t size, size_t num)
         return -1;
 
     result = PyObject_CallFunction(helper->write, "y#", (const char *)ptr,
-                                    (Py_ssize_t)size * num);
+                                   (Py_ssize_t)size * num);
     if (!result)
         return -1;
 
     Py_DECREF(result);
     return num;
-#else /* WITH_THREAD */
+#else  /* WITH_THREAD */
     pgRWHelper *helper = (pgRWHelper *)context->hidden.unknown.data1;
     PyObject *result;
     size_t retval;
@@ -413,7 +414,7 @@ _pg_rw_write(SDL_RWops *context, const void *ptr, size_t size, size_t num)
     state = PyGILState_Ensure();
 
     result = PyObject_CallFunction(helper->write, "y#", (const char *)ptr,
-                                    (Py_ssize_t)size * num);
+                                   (Py_ssize_t)size * num);
     if (!result) {
         PyErr_Print();
         retval = -1;
@@ -506,7 +507,7 @@ pgRWops_FromFileObject(PyObject *obj)
     rw->close = _pg_rw_close;
 
 /* https://docs.python.org/3/c-api/init.html#c.PyEval_InitThreads */
-/* ^ in Python >= 3.7, we don't have to call this function, and in 3.11 
+/* ^ in Python >= 3.7, we don't have to call this function, and in 3.11
  * it will be removed */
 #if PY_VERSION_HEX < 0x03070000
 #ifdef WITH_THREAD
@@ -583,8 +584,8 @@ _pg_rw_seek(SDL_RWops *context, Sint64 offset, int whence)
     if (!(offset == 0 &&
           whence == SEEK_CUR)) /* being seek'd, not just tell'd */
     {
-        result = PyObject_CallFunction(helper->seek, "Li",
-                                    (long long)offset, whence);
+        result = PyObject_CallFunction(helper->seek, "Li", (long long)offset,
+                                       whence);
         if (!result) {
             PyErr_Print();
             retval = -1;
@@ -610,7 +611,7 @@ end:
     PyGILState_Release(state);
 
     return retval;
-#else /* ~WITH_THREAD */
+#else  /* ~WITH_THREAD */
     if (helper->fileno != -1) {
         return lseek(helper->fileno, offset, whence);
     }
@@ -620,8 +621,8 @@ end:
 
     if (!(offset == 0 && whence == SEEK_CUR)) /*being called only for 'tell'*/
     {
-        result = PyObject_CallFunction(helper->seek, "Li",
-                                    (long long)offset, whence);
+        result = PyObject_CallFunction(helper->seek, "Li", (long long)offset,
+                                       whence);
         if (!result)
             return -1;
         Py_DECREF(result);
@@ -667,7 +668,7 @@ _pg_rw_read(SDL_RWops *context, void *ptr, size_t size, size_t maxnum)
     state = PyGILState_Ensure();
 #endif /* WITH_THREAD */
     result = PyObject_CallFunction(helper->read, "K",
-                                    (unsigned long long)size * maxnum);
+                                   (unsigned long long)size * maxnum);
     if (!result) {
         PyErr_Print();
         retval = -1;
@@ -703,9 +704,9 @@ _rwops_from_pystr(PyObject *obj)
     if (obj != NULL) {
         SDL_RWops *rw = NULL;
         PyObject *oencoded;
-        char* encoded = NULL;
-        char* ext = NULL;
-        char* extension = NULL;
+        char *encoded = NULL;
+        char *ext = NULL;
+        char *extension = NULL;
 
         oencoded = pg_EncodeString(obj, "UTF-8", NULL, NULL);
         if (oencoded == NULL) {
@@ -714,12 +715,12 @@ _rwops_from_pystr(PyObject *obj)
         if (oencoded != Py_None) {
             encoded = Bytes_AS_STRING(oencoded);
             rw = SDL_RWFromFile(encoded, "rb");
-            ext = strrchr(encoded, '.');        
+            ext = strrchr(encoded, '.');
             if (ext && strlen(ext) > 1) {
                 ext++;
-                extension = malloc(strlen(ext)+1);
+                extension = malloc(strlen(ext) + 1);
                 if (extension == NULL) {
-                    return (SDL_RWops*)PyErr_NoMemory();
+                    return (SDL_RWops *)PyErr_NoMemory();
                 }
                 strcpy(extension, ext);
             }
@@ -732,28 +733,30 @@ _rwops_from_pystr(PyObject *obj)
              * field for a helper object. */
             rw->hidden.unknown.data1 = (void *)extension;
             return rw;
-        } else {
+        }
+        else {
             if (PyUnicode_Check(obj)) {
                 SDL_ClearError();
 
                 if (os_module) {
-                    PyObject* cwd = PyObject_CallMethod(os_module, "getcwd",
-                                                        NULL);
+                    PyObject *cwd =
+                        PyObject_CallMethod(os_module, "getcwd", NULL);
                     if (cwd == NULL) {
-                        PyErr_SetString(PyExc_FileNotFoundError, 
+                        PyErr_SetString(PyExc_FileNotFoundError,
                                         "No such file or directory.");
                         return NULL;
                     }
 
-                    PyObject* path = PyObject_GetAttrString(os_module, "path");
+                    PyObject *path = PyObject_GetAttrString(os_module, "path");
                     if (path == NULL) {
                         Py_DECREF(cwd);
                         PyErr_SetString(PyExc_FileNotFoundError,
                                         "No such file or directory.");
-                        return NULL;                        
+                        return NULL;
                     }
 
-                    PyObject* isabs = PyObject_CallMethod(path, "isabs", "O", obj);
+                    PyObject *isabs =
+                        PyObject_CallMethod(path, "isabs", "O", obj);
                     if (isabs == NULL) {
                         Py_DECREF(cwd);
                         Py_DECREF(path);
@@ -765,10 +768,11 @@ _rwops_from_pystr(PyObject *obj)
                     if (isabs == Py_False) {
                         PyErr_Format(PyExc_FileNotFoundError,
                                      "No file '%S' found in working directory"
-                                     " '%S'.", obj, cwd);                       
+                                     " '%S'.",
+                                     obj, cwd);
                     }
                     else {
-                        PyErr_Format(PyExc_FileNotFoundError, 
+                        PyErr_Format(PyExc_FileNotFoundError,
                                      "No such file or directory: '%S'.", obj);
                     }
                     Py_DECREF(cwd);
@@ -776,7 +780,7 @@ _rwops_from_pystr(PyObject *obj)
                     Py_DECREF(isabs);
                 }
                 else {
-                    PyErr_Format(PyExc_FileNotFoundError, 
+                    PyErr_Format(PyExc_FileNotFoundError,
                                  "No such file or directory: '%S'.", obj);
                 }
                 return NULL;
@@ -794,7 +798,8 @@ pgRWops_FromObject(PyObject *obj)
     if (!rw) {
         if (PyErr_Occurred())
             return NULL;
-    } else {
+    }
+    else {
         return rw;
     }
     return pgRWops_FromFileObject(obj);

@@ -77,7 +77,6 @@ scale2xraw(SDL_Surface *src, SDL_Surface *dst);
 extern SDL_Surface *
 rotozoomSurface(SDL_Surface *src, double angle, double zoom, int smooth);
 
-
 static int
 _PgSurface_SrcAlpha(SDL_Surface *surf)
 {
@@ -100,8 +99,6 @@ _PgSurface_SrcAlpha(SDL_Surface *surf)
     return 0;
 }
 
-
-
 static SDL_Surface *
 newsurf_fromsurf(SDL_Surface *surf, int width, int height)
 {
@@ -121,7 +118,7 @@ newsurf_fromsurf(SDL_Surface *surf, int width, int height)
     if (!newsurf)
         return (SDL_Surface *)(RAISE(pgExc_SDLError, SDL_GetError()));
 
-        /* Copy palette, colorkey, etc info */
+    /* Copy palette, colorkey, etc info */
     if (SDL_ISPIXELFORMAT_INDEXED(surf->format->format)) {
         if (SDL_SetPaletteColors(newsurf->format->palette,
                                  surf->format->palette->colors, 0,
@@ -152,12 +149,14 @@ newsurf_fromsurf(SDL_Surface *surf, int width, int height)
             SDL_FreeSurface(newsurf);
             return NULL;
         }
-    } else if (isalpha == -1) {
+    }
+    else if (isalpha == -1) {
         PyErr_SetString(pgExc_SDLError, SDL_GetError());
         SDL_FreeSurface(newsurf);
         return NULL;
-    } else {
-        if (SDL_SetSurfaceBlendMode(newsurf, SDL_BLENDMODE_NONE) != 0){
+    }
+    else {
+        if (SDL_SetSurfaceBlendMode(newsurf, SDL_BLENDMODE_NONE) != 0) {
             PyErr_SetString(pgExc_SDLError, SDL_GetError());
             SDL_FreeSurface(newsurf);
             return NULL;
@@ -513,7 +512,7 @@ surf_scale(PyObject *self, PyObject *args, PyObject *kwargs)
     int width, height;
     static char *keywords[] = {"surface", "size", "dest_surface", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!O|O!", keywords, 
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!O|O!", keywords,
                                      &pgSurface_Type, &surfobj, &size,
                                      &pgSurface_Type, &surfobj2))
         return NULL;
@@ -549,9 +548,10 @@ surf_scale(PyObject *self, PyObject *args, PyObject *kwargs)
         pgSurface_Lock(surfobj);
 
         Py_BEGIN_ALLOW_THREADS;
-        if (width==2*surf->w && height==2*surf->h){
+        if (width == 2 * surf->w && height == 2 * surf->h) {
             scale2xraw(surf, newsurf);
-        } else {
+        }
+        else {
             stretch(surf, newsurf);
         }
         Py_END_ALLOW_THREADS;
@@ -577,7 +577,7 @@ surf_scale2x(PyObject *self, PyObject *args, PyObject *kwargs)
     static char *keywords[] = {"surface", "dest_surface", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!|O!", keywords,
-                                     &pgSurface_Type, &surfobj, 
+                                     &pgSurface_Type, &surfobj,
                                      &pgSurface_Type, &surfobj2))
         return NULL;
 
@@ -682,9 +682,8 @@ surf_rotate(PyObject *self, PyObject *args, PyObject *kwargs)
     if (!newsurf)
         return NULL;
 
-        /* get the background color */
-    if (SDL_GetColorKey(surf, &bgcolor) != 0)
-    {
+    /* get the background color */
+    if (SDL_GetColorKey(surf, &bgcolor) != 0) {
         SDL_LockSurface(surf);
         switch (surf->format->BytesPerPixel) {
             case 1:
@@ -890,7 +889,7 @@ surf_rotozoom(PyObject *self, PyObject *args, PyObject *kwargs)
                                      &scale))
         return NULL;
     surf = pgSurface_AsSurface(surfobj);
-    if (scale == 0.0 || surf->w == 0 || surf->h ==0) {
+    if (scale == 0.0 || surf->w == 0 || surf->h == 0) {
         newsurf = newsurf_fromsurf(surf, 0, 0);
         return (PyObject *)pgSurface_New(newsurf);
     }
@@ -1456,13 +1455,13 @@ surf_scalesmooth(PyObject *self, PyObject *args, PyObject *kwargs)
                        (Uint8 *)surf->pixels + y * surf->pitch, width * bpp);
             }
             Py_END_ALLOW_THREADS;
-        } else {
+        }
+        else {
             struct _module_state *st = GETSTATE(self);
             Py_BEGIN_ALLOW_THREADS;
             scalesmooth(surf, newsurf, st);
             Py_END_ALLOW_THREADS;
         }
-
 
         pgSurface_Unlock(surfobj);
         SDL_UnlockSurface(newsurf);
@@ -1758,10 +1757,10 @@ surf_threshold(PyObject *self, PyObject *args, PyObject *kwds)
     Returns the number of pixels within the threshold.
     */
     static char *kwlist[] = {
-        "dest_surface",    /* Surface we are changing. See 'set_behavior'.
-                             None - if counting (set_behavior is 0),
-                                    don't need 'dest_surf'. */
-        "surface",         /* Surface we are looking at. */
+        "dest_surface", /* Surface we are changing. See 'set_behavior'.
+                          None - if counting (set_behavior is 0),
+                                 don't need 'dest_surf'. */
+        "surface",      /* Surface we are looking at. */
         "search_color", /* Color we are searching for. */
         "threshold",    /* =(0,0,0,0)  Within this distance from
                                        search_color (or search_surf). */
@@ -1870,10 +1869,10 @@ surf_threshold(PyObject *self, PyObject *args, PyObject *kwds)
     }
 
     if (dest_surf)
-        pgSurface_Lock((pgSurfaceObject*)dest_surf_obj);
+        pgSurface_Lock((pgSurfaceObject *)dest_surf_obj);
     pgSurface_Lock(surf_obj);
     if (search_surf)
-        pgSurface_Lock((pgSurfaceObject*)search_surf_obj);
+        pgSurface_Lock((pgSurfaceObject *)search_surf_obj);
 
     Py_BEGIN_ALLOW_THREADS;
     num_threshold_pixels =
@@ -1882,10 +1881,10 @@ surf_threshold(PyObject *self, PyObject *args, PyObject *kwds)
     Py_END_ALLOW_THREADS;
 
     if (dest_surf)
-        pgSurface_Unlock((pgSurfaceObject*)dest_surf_obj);
+        pgSurface_Unlock((pgSurfaceObject *)dest_surf_obj);
     pgSurface_Unlock(surf_obj);
     if (search_surf)
-        pgSurface_Unlock((pgSurfaceObject*)search_surf_obj);
+        pgSurface_Unlock((pgSurfaceObject *)search_surf_obj);
 
     return PyInt_FromLong(num_threshold_pixels);
 }
@@ -1941,7 +1940,7 @@ clamp_4
             *(p_byte_buf + (p_format->Gshift >> 3)) =                         \
                 (Uint8)(p_color >> p_format->Gshift);                         \
             *(p_byte_buf + (p_format->Bshift >> 3)) =                         \
-                (Uint8)(p_color >> p_format->Bshift);                          \
+                (Uint8)(p_color >> p_format->Bshift);                         \
             break;                                                            \
         default:                                                              \
             *((Uint32 *)(p_pixels + (p_y)*p_surf->pitch) + (p_x)) = p_color;  \
@@ -2185,7 +2184,7 @@ surf_laplacian(PyObject *self, PyObject *args, PyObject *kwargs)
     SDL_Surface *newsurf;
     static char *keywords[] = {"surface", "dest_surface", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!|O!", keywords, 
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!|O!", keywords,
                                      &pgSurface_Type, &surfobj,
                                      &pgSurface_Type, &surfobj2))
         return NULL;
@@ -2427,11 +2426,11 @@ surf_average_surfaces(PyObject *self, PyObject *args, PyObject *kwargs)
     int palette_colors = 1;
     PyObject *list, *obj;
     PyObject *ret = NULL;
-    static char *keywords[] = {"surfaces", "dest_surface", 
-                               "palette_colors", NULL};
+    static char *keywords[] = {"surfaces", "dest_surface", "palette_colors",
+                               NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|O!i", keywords, &list,
-                                     &pgSurface_Type, &surfobj2, 
+                                     &pgSurface_Type, &surfobj2,
                                      &palette_colors))
         return NULL;
 
@@ -2582,7 +2581,7 @@ surf_average_surfaces(PyObject *self, PyObject *args, PyObject *kwargs)
  * So turn optimisations off here */
 #if defined(__GNUC__) && defined(__PPC64__)
 #pragma GCC push_options
-#pragma GCC optimize ("O0")
+#pragma GCC optimize("O0")
 #endif
 
 void
@@ -2631,22 +2630,20 @@ average_color(SDL_Surface *surf, int x, int y, int width, int height, Uint8 *r,
     height_and_y = height + y;
 
     switch (format->BytesPerPixel) {
-        case 1:
-            {
-                Uint8 color8;
-                for (row = y; row < height_and_y; row++) {
-                    pixels = (Uint8 *)surf->pixels + row * surf->pitch + x;
-                    for (col = x; col < width_and_x; col++) {
-                        color8 = *(Uint8 *)pixels;
-                        rtot += ((color8 & rmask) >> rshift) << rloss;
-                        gtot += ((color8 & gmask) >> gshift) << gloss;
-                        btot += ((color8 & bmask) >> bshift) << bloss;
-                        atot += ((color8 & amask) >> ashift) << aloss;
-                        pixels++;
-                    }
+        case 1: {
+            Uint8 color8;
+            for (row = y; row < height_and_y; row++) {
+                pixels = (Uint8 *)surf->pixels + row * surf->pitch + x;
+                for (col = x; col < width_and_x; col++) {
+                    color8 = *(Uint8 *)pixels;
+                    rtot += ((color8 & rmask) >> rshift) << rloss;
+                    gtot += ((color8 & gmask) >> gshift) << gloss;
+                    btot += ((color8 & bmask) >> bshift) << bloss;
+                    atot += ((color8 & amask) >> ashift) << aloss;
+                    pixels++;
                 }
             }
-            break;
+        } break;
         case 2:
             for (row = y; row < height_and_y; row++) {
                 pixels = (Uint8 *)surf->pixels + row * surf->pitch + x * 2;
@@ -2718,7 +2715,7 @@ surf_average_color(PyObject *self, PyObject *args, PyObject *kwargs)
     int x, y, w, h;
     static char *keywords[] = {"surface", "rect", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!|O", keywords, 
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!|O", keywords,
                                      &pgSurface_Type, &surfobj, &rectobj))
         return NULL;
 
@@ -2753,18 +2750,18 @@ static PyMethodDef _transform_methods[] = {
      DOC_PYGAMETRANSFORMSCALE},
     {"rotate", (PyCFunction)surf_rotate, METH_VARARGS | METH_KEYWORDS,
      DOC_PYGAMETRANSFORMROTATE},
-    {"flip", (PyCFunction)surf_flip, METH_VARARGS | METH_KEYWORDS, 
+    {"flip", (PyCFunction)surf_flip, METH_VARARGS | METH_KEYWORDS,
      DOC_PYGAMETRANSFORMFLIP},
     {"rotozoom", (PyCFunction)surf_rotozoom, METH_VARARGS | METH_KEYWORDS,
      DOC_PYGAMETRANSFORMROTOZOOM},
-    {"chop", (PyCFunction)surf_chop, METH_VARARGS | METH_KEYWORDS, 
+    {"chop", (PyCFunction)surf_chop, METH_VARARGS | METH_KEYWORDS,
      DOC_PYGAMETRANSFORMCHOP},
     {"scale2x", (PyCFunction)surf_scale2x, METH_VARARGS | METH_KEYWORDS,
      DOC_PYGAMETRANSFORMSCALE2X},
     {"smoothscale", (PyCFunction)surf_scalesmooth,
      METH_VARARGS | METH_KEYWORDS, DOC_PYGAMETRANSFORMSMOOTHSCALE},
-    {"get_smoothscale_backend", surf_get_smoothscale_backend,
-     METH_NOARGS, DOC_PYGAMETRANSFORMGETSMOOTHSCALEBACKEND},
+    {"get_smoothscale_backend", surf_get_smoothscale_backend, METH_NOARGS,
+     DOC_PYGAMETRANSFORMGETSMOOTHSCALEBACKEND},
     {"set_smoothscale_backend", (PyCFunction)surf_set_smoothscale_backend,
      METH_VARARGS | METH_KEYWORDS, DOC_PYGAMETRANSFORMSETSMOOTHSCALEBACKEND},
     {"threshold", (PyCFunction)surf_threshold, METH_VARARGS | METH_KEYWORDS,

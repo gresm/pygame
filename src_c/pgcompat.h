@@ -29,8 +29,8 @@
 
 /* Module init function returns new module instance. */
 #define MODINIT_RETURN(x) return x
-#define MODINIT_DEFINE(mod_name) PyMODINIT_FUNC PyInit_##mod_name (void)
-#define DECREF_MOD(mod) Py_DECREF (mod)
+#define MODINIT_DEFINE(mod_name) PyMODINIT_FUNC PyInit_##mod_name(void)
+#define DECREF_MOD(mod) Py_DECREF(mod)
 
 /* Text interface. Use unicode strings. */
 #define Text_Type PyUnicode_Type
@@ -87,7 +87,7 @@
 
 /* Module init function returns nothing. */
 #define MODINIT_RETURN(x) return
-#define MODINIT_DEFINE(mod_name) PyMODINIT_FUNC init##mod_name (void)
+#define MODINIT_DEFINE(mod_name) PyMODINIT_FUNC init##mod_name(void)
 #define DECREF_MOD(mod)
 
 /* Text interface. Use ascii strings. */
@@ -127,31 +127,31 @@
 
 #define PY2 (!PY3)
 
-#define MODINIT_ERROR MODINIT_RETURN (NULL)
+#define MODINIT_ERROR MODINIT_RETURN(NULL)
 
 /* Module state. These macros are used to define per-module macros.
  * v - global state variable (Python 2.x)
  * s - global state structure (Python 3.x)
  */
 #define PY2_GETSTATE(v) (&(v))
-#define PY3_GETSTATE(s, m) ((struct s *) PyModule_GetState (m))
+#define PY3_GETSTATE(s, m) ((struct s *)PyModule_GetState(m))
 
 /* Pep 3123: Making PyObject_HEAD conform to standard C */
 #if !defined(Py_TYPE)
-#define Py_TYPE(o)    (((PyObject *)(o))->ob_type)
-#define Py_REFCNT(o)  (((PyObject *)(o))->ob_refcnt)
-#define Py_SIZE(o)    (((PyVarObject *)(o))->ob_size)
+#define Py_TYPE(o) (((PyObject *)(o))->ob_type)
+#define Py_REFCNT(o) (((PyObject *)(o))->ob_refcnt)
+#define Py_SIZE(o) (((PyVarObject *)(o))->ob_size)
 #endif
 
 /* Encode a unicode file path */
 #define Unicode_AsEncodedPath(u) \
-    PyUnicode_AsEncodedString ((u), UNICODE_DEF_FS_CODEC, UNICODE_DEF_FS_ERROR)
+    PyUnicode_AsEncodedString((u), UNICODE_DEF_FS_CODEC, UNICODE_DEF_FS_ERROR)
 
 #define RELATIVE_MODULE(m) ("." m)
 
 #define HAVE_OLD_BUFPROTO PY2
 
-#if !defined(PG_ENABLE_OLDBUF)  /* allow for command line override */
+#if !defined(PG_ENABLE_OLDBUF) /* allow for command line override */
 #if HAVE_OLD_BUFPROTO
 #define PG_ENABLE_OLDBUF 1
 #else
@@ -175,9 +175,9 @@
 #define Slice_GET_INDICES_EX(slice, length, start, stop, step, slicelength) \
     PySlice_GetIndicesEx(slice, length, start, stop, step, slicelength)
 #else
-#define Slice_GET_INDICES_EX(slice, length, start, stop, step, slicelength) \
-    PySlice_GetIndicesEx((PySliceObject *)(slice), length, \
-                         start, stop, step, slicelength)
+#define Slice_GET_INDICES_EX(slice, length, start, stop, step, slicelength)   \
+    PySlice_GetIndicesEx((PySliceObject *)(slice), length, start, stop, step, \
+                         slicelength)
 #endif
 
 #if defined(SDL_VERSION_ATLEAST)
@@ -186,12 +186,18 @@
 
   https://wiki.libsdl.org/SDL_SetWindowResizable
 */
-void SDL_SetWindowResizable(SDL_Window *window, SDL_bool resizable);
-int SDL_GetWindowOpacity(SDL_Window *window, float *opacity);
-int SDL_SetWindowOpacity(SDL_Window *window, float opacity);
-int SDL_SetWindowModalFor(SDL_Window *modal_window, SDL_Window *parent_window);
-int SDL_SetWindowInputFocus(SDL_Window *window);
-SDL_Surface * SDL_CreateRGBSurfaceWithFormat(Uint32 flags, int width, int height, int depth,
+void
+SDL_SetWindowResizable(SDL_Window *window, SDL_bool resizable);
+int
+SDL_GetWindowOpacity(SDL_Window *window, float *opacity);
+int
+SDL_SetWindowOpacity(SDL_Window *window, float opacity);
+int
+SDL_SetWindowModalFor(SDL_Window *modal_window, SDL_Window *parent_window);
+int
+SDL_SetWindowInputFocus(SDL_Window *window);
+SDL_Surface *
+SDL_CreateRGBSurfaceWithFormat(Uint32 flags, int width, int height, int depth,
                                Uint32 format);
 #endif
 #endif /* defined(SDL_VERSION_ATLEAST) */
@@ -199,9 +205,9 @@ SDL_Surface * SDL_CreateRGBSurfaceWithFormat(Uint32 flags, int width, int height
 // Currently needed to build scrap.c, event.c, display.c
 // with Windows SDK 10.0.18362.0 and SDL1 build
 #ifdef _MSC_VER
-    #ifndef WINDOWS_IGNORE_PACKING_MISMATCH
-        #define WINDOWS_IGNORE_PACKING_MISMATCH
-    #endif
+#ifndef WINDOWS_IGNORE_PACKING_MISMATCH
+#define WINDOWS_IGNORE_PACKING_MISMATCH
+#endif
 #endif
 
 #endif /* ~PGCOMPAT_INTERNAL_H */

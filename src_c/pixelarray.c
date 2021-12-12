@@ -167,8 +167,7 @@ _cleanup_array(pgPixelArrayObject *array)
         Py_DECREF(array->parent);
     }
     else {
-        pgSurface_UnlockBy(array->surface,
-                           (PyObject *)array);
+        pgSurface_UnlockBy(array->surface, (PyObject *)array);
     }
     Py_DECREF(array->surface);
     Py_XDECREF(array->dict);
@@ -278,25 +277,24 @@ static PyBufferProcs _pxarray_bufferprocs = {
     (Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC)
 
 static PyTypeObject pgPixelArray_Type = {
-    PyVarObject_HEAD_INIT(NULL,0)
-    "pygame.PixelArray",                    /* tp_name */
-    sizeof(pgPixelArrayObject),             /* tp_basicsize */
-    0,                                      /* tp_itemsize */
-    (destructor)_pxarray_dealloc,           /* tp_dealloc */
-    0,                                      /* tp_print */
-    0,                                      /* tp_getattr */
-    0,                                      /* tp_setattr */
-    0,                                      /* tp_compare */
-    (reprfunc)_pxarray_repr,                /* tp_repr */
-    0,                                      /* tp_as_number */
-    &_pxarray_sequence,                     /* tp_as_sequence */
-    &_pxarray_mapping,                      /* tp_as_mapping */
-    0,                                      /* tp_hash */
-    0,                                      /* tp_call */
-    0,                                      /* tp_str */
-    0,                                      /* tp_getattro */
-    0,                                      /* tp_setattro */
-    PXARRAY_BUFFERPROCS,                    /* tp_as_buffer */
+    PyVarObject_HEAD_INIT(NULL, 0) "pygame.PixelArray", /* tp_name */
+    sizeof(pgPixelArrayObject),                         /* tp_basicsize */
+    0,                                                  /* tp_itemsize */
+    (destructor)_pxarray_dealloc,                       /* tp_dealloc */
+    0,                                                  /* tp_print */
+    0,                                                  /* tp_getattr */
+    0,                                                  /* tp_setattr */
+    0,                                                  /* tp_compare */
+    (reprfunc)_pxarray_repr,                            /* tp_repr */
+    0,                                                  /* tp_as_number */
+    &_pxarray_sequence,                                 /* tp_as_sequence */
+    &_pxarray_mapping,                                  /* tp_as_mapping */
+    0,                                                  /* tp_hash */
+    0,                                                  /* tp_call */
+    0,                                                  /* tp_str */
+    0,                                                  /* tp_getattro */
+    0,                                                  /* tp_setattro */
+    PXARRAY_BUFFERPROCS,                                /* tp_as_buffer */
     PXARRAY_TPFLAGS,
     DOC_PYGAMEPIXELARRAY,                   /* tp_doc */
     (traverseproc)_pxarray_traverse,        /* tp_traverse */
@@ -1923,7 +1921,8 @@ pgPixelArray_New(PyObject *surfobj)
     }
 
     return (PyObject *)_pxarray_new_internal(
-        &pgPixelArray_Type, (pgSurfaceObject *)surfobj, 0, pixels, dim0, dim1, stride0, stride1);
+        &pgPixelArray_Type, (pgSurfaceObject *)surfobj, 0, pixels, dim0, dim1,
+        stride0, stride1);
 }
 
 MODINIT_DEFINE(pixelarray)

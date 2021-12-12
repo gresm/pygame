@@ -362,7 +362,6 @@ _pg_do_rects_intersect(GAME_Rect *A, GAME_Rect *B)
             MAX(A->y, A->y + A->h) > MIN(B->y, B->y + B->h));
 }
 
-
 static PyObject *
 pg_rect_normalize(pgRectObject *self, PyObject *args)
 {
@@ -428,7 +427,8 @@ pg_rect_inflate_ip(pgRectObject *self, PyObject *args)
 }
 
 static PyObject *
-pg_rect_update(pgRectObject* self, PyObject* args) {
+pg_rect_update(pgRectObject *self, PyObject *args)
+{
     GAME_Rect temp;
     GAME_Rect *argrect = pgRect_FromObject(args, &temp);
 
@@ -513,7 +513,7 @@ pg_rect_unionall(pgRectObject *self, PyObject *args)
         if (!obj || !(argrect = pgRect_FromObject(obj, &temp))) {
             Py_XDECREF(obj);
             return RAISE(PyExc_TypeError,
-                  "Argument must be a sequence of rectstyle objects.");
+                         "Argument must be a sequence of rectstyle objects.");
         }
         l = MIN(l, argrect->x);
         t = MIN(t, argrect->y);
@@ -560,7 +560,7 @@ pg_rect_unionall_ip(pgRectObject *self, PyObject *args)
         if (!obj || !(argrect = pgRect_FromObject(obj, &temp))) {
             Py_XDECREF(obj);
             return RAISE(PyExc_TypeError,
-                  "Argument must be a sequence of rectstyle objects.");
+                         "Argument must be a sequence of rectstyle objects.");
         }
         l = MIN(l, argrect->x);
         t = MIN(t, argrect->y);
@@ -785,9 +785,9 @@ pg_rect_collidedictall(pgRectObject *self, PyObject *args)
                 return NULL;
             }
             if (0 != PyList_Append(ret, num)) {
-               Py_DECREF(ret);
-               Py_DECREF(num);
-               return NULL; /* Exception already set. */
+                Py_DECREF(ret);
+                Py_DECREF(num);
+                return NULL; /* Exception already set. */
             }
             Py_DECREF(num);
         }
@@ -961,19 +961,18 @@ _pg_rect_contains(pgRectObject *self, PyObject *arg)
 {
     GAME_Rect *argrect, temp_arg;
     if (!(argrect = pgRect_FromObject((PyObject *)arg, &temp_arg))) {
-       return -1;
+        return -1;
     }
-    return  (self->r.x <= argrect->x) && (self->r.y <= argrect->y) &&
-                (self->r.x + self->r.w >= argrect->x + argrect->w) &&
-                (self->r.y + self->r.h >= argrect->y + argrect->h) &&
-                (self->r.x + self->r.w > argrect->x) &&
-                (self->r.y + self->r.h > argrect->y);
-    }
-
+    return (self->r.x <= argrect->x) && (self->r.y <= argrect->y) &&
+           (self->r.x + self->r.w >= argrect->x + argrect->w) &&
+           (self->r.y + self->r.h >= argrect->y + argrect->h) &&
+           (self->r.x + self->r.w > argrect->x) &&
+           (self->r.y + self->r.h > argrect->y);
+}
 
 static PyObject *
 pg_rect_contains(pgRectObject *self, PyObject *arg)
-{ 
+{
     int ret = _pg_rect_contains(self, arg);
     if (ret < 0) {
         return RAISE(PyExc_TypeError, "Argument must be rect style object");
@@ -981,19 +980,16 @@ pg_rect_contains(pgRectObject *self, PyObject *arg)
     return PyBool_FromLong(ret);
 }
 
-static int 
-pg_rect_contains_seq(pgRectObject *self, PyObject *arg) {
+static int
+pg_rect_contains_seq(pgRectObject *self, PyObject *arg)
+{
     if (PyLong_Check(arg)) {
-        int coord = (int) PyInt_AsLong(arg);
-        return coord == self->r.x || 
-            coord == self->r.y || 
-            coord == self->r.w || 
-            coord == self->r.h;
+        int coord = (int)PyInt_AsLong(arg);
+        return coord == self->r.x || coord == self->r.y ||
+               coord == self->r.w || coord == self->r.h;
     }
     return _pg_rect_contains(self, arg);
 }
-
-
 
 static PyObject *
 pg_rect_clamp(pgRectObject *self, PyObject *args)
@@ -1150,8 +1146,6 @@ pg_rect_length(PyObject *_self)
 {
     return 4;
 }
-
-
 
 static PyObject *
 pg_rect_item(pgRectObject *self, Py_ssize_t i)
@@ -2054,10 +2048,9 @@ static PyGetSetDef pg_rect_getsets[] = {
 };
 
 static PyTypeObject pgRect_Type = {
-    PyVarObject_HEAD_INIT(NULL,0)
-    "pygame.Rect",                    /*name*/
-    sizeof(pgRectObject),             /*basicsize*/
-    0,                                /*itemsize*/
+    PyVarObject_HEAD_INIT(NULL, 0) "pygame.Rect", /*name*/
+    sizeof(pgRectObject),                         /*basicsize*/
+    0,                                            /*itemsize*/
     /* methods */
     (destructor)pg_rect_dealloc, /*dealloc*/
     (printfunc)NULL,             /*print*/
